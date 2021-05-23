@@ -61,7 +61,7 @@ class ApiTokenController extends Controller
         
         $user->tokens()->where('tokenable_id', $user->id)->delete();
 
-        $token = $user->createToken($request->device_name)->plainTextToken;
+        $token = $user->createToken($request->email)->plainTextToken;
 
         return response()->json([
             'token' => $token,

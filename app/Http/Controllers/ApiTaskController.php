@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ApiTaskController extends Controller
 {
@@ -13,7 +15,10 @@ class ApiTaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::where('user_id', Auth::id())->get();
+        return response()->json([
+            'tasks' => $tasks
+        ]);
     }
 
     /**
@@ -24,7 +29,18 @@ class ApiTaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $tasks = Task::create([
+            'body' => $request->body,
+            'done' => false,
+            'user_id' => $request->user()->id
+        ]);
+        $tasks->save();
+        
+        if(!$request->user()->tokenCan('tasks:write')){
+            return response()->json(['message' => "You don't have the ability to do that. Please contact administrator"], 403);
+        }
+
+        return response()->json(['message' => 'Task created'], 201);
     }
 
     /**

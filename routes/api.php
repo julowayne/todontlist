@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ApiTaskController;
+use App\Http\Controllers\ApiTokenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,9 @@ Route::post('auth/login', [ApiTokenController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('auth/me', [ApiTokenController::class, 'me']);
     Route::post('auth/logout', [ApiTokenController::class, 'logout']);
+    Route::get('/tasks', [ApiTaskController::class, 'index']);
+    Route::get('/tasks/{id}', [ApiTaskController::class, 'show']);
+    Route::post('/tasks', [ApiTaskController::class, 'store']);
 });
 
 Route::middleware('auth:sanctum')->post('auth/me', [ApiTokenController::class, 'me']);
