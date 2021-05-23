@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('auth/logout', [ApiTokenController::class, 'logout']);
     Route::get('/tasks', [ApiTaskController::class, 'index']);
     Route::get('/tasks/{id}', [ApiTaskController::class, 'show']);
+    Route::put('/tasks/{id}', [ApiTaskController::class, 'update']);
+    Route::delete('/tasks/{id}', [ApiTaskController::class, 'destroy']);
     Route::post('/tasks', [ApiTaskController::class, 'store']);
 });
 

@@ -43,7 +43,7 @@ class ApiTokenController extends Controller
             'email' => $user->email,
             'name' => $user->name,
             'created_at' => $user->created_at
-        ]);
+        ], 201);
     }
     public function login(Request $request)
     {
@@ -68,7 +68,7 @@ class ApiTokenController extends Controller
             'email' => $user->email,
             'name' => $user->name,
             'created_at' => $user->created_at
-        ]);
+        ], 200);
     
     }
     
@@ -80,7 +80,7 @@ class ApiTokenController extends Controller
             'name' => $request->user()->name,
             'created_at' => $request->user()->created_at,
             'updated_at' => $request->user()->update_at
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request)
@@ -89,48 +89,4 @@ class ApiTokenController extends Controller
         return response(null, 204);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

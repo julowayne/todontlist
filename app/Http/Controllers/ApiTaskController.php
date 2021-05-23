@@ -15,10 +15,11 @@ class ApiTaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::where('user_id', Auth::id())->get();
+        $tasks = Task::where('user_id', Auth::id())->orderBy('created_at', "desc")->get();
+
         return response()->json([
             'tasks' => $tasks
-        ]);
+        ], 201);
     }
 
     /**
@@ -29,18 +30,24 @@ class ApiTaskController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'done' => 'required|boolean',
+            'body' => 'required|string'
+        ]);
+
         $tasks = Task::create([
             'body' => $request->body,
-            'done' => false,
+            'done' => $request->done,
             'user_id' => $request->user()->id
         ]);
-        $tasks->save();
-        
+
         if(!$request->user()->tokenCan('tasks:write')){
             return response()->json(['message' => "You don't have the ability to do that. Please contact administrator"], 403);
         }
 
-        return response()->json(['message' => 'Task created'], 201);
+        $tasks->save();
+        return response()->json([$tasks], 200);
     }
 
     /**
@@ -51,7 +58,16 @@ class ApiTaskController extends Controller
      */
     public function show($id)
     {
-        //
+        $tasks = Task::find($id);
+        if(!$tasks){
+            return response()->json("La tâche n'existe pas", 404);
+        }
+        if($tasks->user->id !== Auth::id()){
+            return response()->json('Accès a la tâche non autorisé', 403);
+        }
+        return response()->json([
+            $tasks
+        ]);
     }
 
     /**
@@ -63,7 +79,22 @@ class ApiTaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'content' => 'required|string'
+        ]);
+
+        $tasks = Task::find($id);
+        if(!$tasks){
+            return response()->json("La tâche n'existe pas", 404);
+        }
+        if($tasks->user->id !== Auth::id()){
+            return response()->json('Accès a la tâche non autorisé', 403);
+        }
+        $tasks->body = $request->content;
+        $tasks->save();
+        return response()->json([
+            $tasks
+        ]);
     }
 
     /**
@@ -74,6 +105,16 @@ class ApiTaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $tasks = Task::find($id);
+        if(!$tasks){
+            return response()->json("La tâche n'existe pas", 404);
+        }
+        if($tasks->user->id !== Auth::id()){
+            return response()->json('Accès a la tâche non autorisé', 403);
+        }
+        $tasks->delete();
+        return response()->json([
+            $tasks
+        ]);
     }
 }
