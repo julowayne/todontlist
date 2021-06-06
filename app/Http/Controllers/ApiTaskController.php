@@ -47,7 +47,7 @@ class ApiTaskController extends Controller
         }
 
         $tasks->save();
-        return response()->json([$tasks], 200);
+        return response()->json([$tasks], 201);
     }
 
     /**
@@ -67,7 +67,7 @@ class ApiTaskController extends Controller
         }
         return response()->json([
             $tasks
-        ]);
+        ], 200);
     }
 
     /**
