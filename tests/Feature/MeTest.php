@@ -8,10 +8,9 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class LogoutTest extends TestCase
+class MeTest extends TestCase
 {
-
-    public function test_logout_with_success()
+    public function test_me_with_success()
     {
         $userData = [
             'email' => $this->faker->email(),
@@ -24,14 +23,14 @@ class LogoutTest extends TestCase
 
         $this->actingAs($user, 'api');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->postJson('/api/auth/logout', $userData);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->postJson('/api/auth/me', $userData);
 
-        $response->assertStatus(204);
+        $response->assertStatus(200)->assertJsonStructure(['name', 'email', 'created_at', 'updated_at']);
     }
 
     public function test_unauthenticated()
     {
-        $response = $this->postJson('/api/auth/logout');
+        $response = $this->postJson('/api/auth/me');
 
         $response->assertStatus(401)->assertJsonStructure(['message']);
     }

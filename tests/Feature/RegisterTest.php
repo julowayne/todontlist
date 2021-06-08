@@ -2,66 +2,65 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
-    public function test_empty_input()
+    public function test_register_with_success()
     {
+        $data = [
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password(6),
+            'name' => $this->faker->name()
+        ];
+
+        $response = $this->postJson('/api/auth/register', $data);
+        $response->assertStatus(201)
+            ->assertJsonStructure(['token', 'name', 'email', 'created_at'])
+            ->assertJson(['name' => $data['name'], 'email' => $data['email']]);
+    }
+
+    public function test_no_input()
+    {
+
         $response = $this->postJson('/api/auth/register');
-        $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
+        $response->assertStatus(422)->assertJsonStructure(['errors']);
     }
 
     public function test_invalid_input()
     {
         $data = [
-            'email' => $this->faker->name,
-            'password' => $this->faker->password,
+            'email' => $this->faker->name(),
+            'password' => $this->faker->password(6),
+            'name' => $this->faker->name()
         ];
 
         $response = $this->postJson('/api/auth/register', $data);
-        $response->assertStatus(422)->assertJsonStructure(['message', 'errors']);
+        $response->assertStatus(422)->assertJsonStructure(['errors']);
     }
-
-    public function test_register_with_success()
-    {
-        $password = $this->faker->password(8);
-
-        $user = [
-            'name' => $this->faker->name,
-            'email' => $this->faker->email,
-        ];
-
-        $form = [
-            'name' => $user['name'],
-            'email' => $user['email'],
-            'password' => $password
-        ];
-
-
-        $response = $this->postJson('/api/auth/register', $form);
-
-        $this->assertDatabaseHas('users', $user);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure(['token', 'name', 'email', 'created_at'])
-            ->assertJson(['email' => $user['email'], 'name' => $user['name']]);
-    }
-
 
     public function test_already_registered()
     {
-
-        $form = [
-            'name' => $this->faker->name,
-            'email' => $this->faker->email,
-            'password' => $this->faker->password(8)
+        $password = $this->faker->password(8);
+        $userData = [
+            'email' => $this->faker->email(),
+            'password' => Hash::make($password),
+            'name' => $this->faker->name()
         ];
+        $user = User::create($userData);
+        $this->assertDatabaseHas('users', $userData);
 
-        $this->postJson('/api/auth/register', $form);
-
-        $response = $this->postJson('/api/auth/register', $form);
-
-        $response->assertStatus(409)->assertJsonStructure(['error']);
+        $formData = [
+            'email' => $user->email,
+            'password' => Hash::make($password),
+            'name' => $this->faker->name()
+        ];
+        $response = $this->postJson('/api/auth/register', $formData);
+        $response->assertStatus(409)
+            ->assertJsonStructure(['error']);
     }
 }
